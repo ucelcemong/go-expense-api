@@ -30,11 +30,12 @@ func main() {
 	http.HandleFunc("/user-expenses", handlers.GetUserExpenses)
 
 port := os.Getenv("PORT")
+
+fmt.Println("PORT from env:", port)
+
 if port == "" {
 	port = "8080"
 }
-
-fmt.Println("Server running on port", port)
 
 err := http.ListenAndServe(":"+port, nil)
 if err != nil {

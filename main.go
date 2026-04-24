@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"expense-api/database"
 	"expense-api/handlers"
@@ -15,18 +16,24 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-
 	database.Connect()
+
+	http.HandleFunc("/", homeHandler)
 
 	http.HandleFunc("/users", handlers.GetUsers)
 	http.HandleFunc("/users/create", handlers.CreateUser)
 
 	http.HandleFunc("/expenses", handlers.GetExpenses)
 	http.HandleFunc("/expenses/create", handlers.CreateExpense)
-	http.HandleFunc("/expenses/delete", handlers.DeleteExpense)
 	http.HandleFunc("/expenses/update", handlers.UpdateExpense)
+	http.HandleFunc("/expenses/delete", handlers.DeleteExpense)
 	http.HandleFunc("/user-expenses", handlers.GetUserExpenses)
 
-	fmt.Println("Server running on port 4000...")
-	http.ListenAndServe(":4000", nil)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "4000"
+	}
+
+	fmt.Println("Server running on port", port)
+	http.ListenAndServe(":"+port, nil)
 }

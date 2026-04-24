@@ -9,8 +9,7 @@ import (
 	"expense-api/handlers"
 )
 
-//----------HOME-----------
-
+// HOME
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Expense API is running ...")
 }
@@ -29,15 +28,15 @@ func main() {
 	http.HandleFunc("/expenses/delete", handlers.DeleteExpense)
 	http.HandleFunc("/user-expenses", handlers.GetUserExpenses)
 
-port := os.Getenv("PORT")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 
-fmt.Println("PORT from env:", port)
+	fmt.Println("Server running on port", port)
 
-if port == "" {
-	port = "8080"
-}
-
-err := http.ListenAndServe(":"+port, nil)
-if err != nil {
-	fmt.Println("Server error:", err)
+	err := http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		fmt.Println("Server error:", err)
+	}
 }

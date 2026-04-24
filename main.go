@@ -29,11 +29,14 @@ func main() {
 	http.HandleFunc("/expenses/delete", handlers.DeleteExpense)
 	http.HandleFunc("/user-expenses", handlers.GetUserExpenses)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
+port := os.Getenv("PORT")
+if port == "" {
+	port = "8080"
+}
 
-	fmt.Println("Server running on port", port)
-	http.ListenAndServe(":"+port, nil)
+fmt.Println("Server running on port", port)
+
+err := http.ListenAndServe(":"+port, nil)
+if err != nil {
+	fmt.Println("Server error:", err)
 }

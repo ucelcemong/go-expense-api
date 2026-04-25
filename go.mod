@@ -2,10 +2,7 @@ module expense-api
 
 go 1.26.2
 
-require (
-	github.com/mattn/go-sqlite3 v1.14.42
-	modernc.org/sqlite v1.49.1
-)
+require modernc.org/sqlite v1.49.1
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect

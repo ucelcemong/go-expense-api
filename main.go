@@ -16,18 +16,25 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	fmt.Println("APP STARTING...")
+
+	// Connect database
 	database.Connect()
+
 	fmt.Println("AFTER DB CONNECT")
 
+	// Routes
 	http.HandleFunc("/", homeHandler)
+
 	http.HandleFunc("/users", handlers.GetUsers)
 	http.HandleFunc("/users/create", handlers.CreateUser)
+
 	http.HandleFunc("/expenses", handlers.GetExpenses)
 	http.HandleFunc("/expenses/create", handlers.CreateExpense)
 	http.HandleFunc("/expenses/update", handlers.UpdateExpense)
 	http.HandleFunc("/expenses/delete", handlers.DeleteExpense)
 	http.HandleFunc("/user-expenses", handlers.GetUserExpenses)
 
+	// Port Railway
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -35,6 +42,7 @@ func main() {
 
 	fmt.Println("Server running on port", port)
 
+	// Start server
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		fmt.Println("Server error:", err)

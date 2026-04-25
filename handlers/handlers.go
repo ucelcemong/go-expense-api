@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"expense-api/database"
 	"expense-api/models"
 )
@@ -22,7 +24,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var user models.User
-		rows.Scan(&user.ID, &user.Name)
+		rows.Scan(&user.ID, &user.Username)
 		users = append(users, user)
 	}
 
@@ -35,7 +37,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	result, err := database.DB.Exec(
 		"INSERT INTO users(name) VALUES(?)",
-		user.Name,
+		user.Username,
 	)
 
 	if err != nil {
@@ -161,4 +163,81 @@ func GetUserExpenses(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(expenses)
+}
+
+//============ Register User=============
+
+type RegisterRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func RegisterUser(w http.ResponseWriter, r *http.Request) {
+	var req RegisterRequest
+
+	json.NewDecoder(r.Body).Decode(&req)
+
+	// hash password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		http.Error(w, "error hashing password", http.StatusInternalServerError)
+		return
+	}
+
+	// insert ke DB
+	result, err := database.DB.Exec(
+		"INSERT INTO users(username, password) VALUES(?,?)",
+		req.Username,
+		string(hashedPassword),
+	)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	id, _ := result.LastInsertId()
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"id":       id,
+		"username": req.Username,
+	})
+}
+
+//=============Login Request==================
+
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func LoginUser(w http.ResponseWriter, r *http.Request) {
+	var req LoginRequest
+
+	json.NewDecoder(r.Body).Decode(&req)
+
+	var stored models.User
+
+	err := database.DB.QueryRow(
+		"SELECT id, username, password FROM users WHERE username=?",
+		req.Username,
+	).Scan(&stored.ID, &stored.Username, &stored.Password)
+
+	if err != nil {
+		http.Error(w, "user not found", http.StatusUnauthorized)
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(stored.Password), []byte(req.Password))
+	if err != nil {
+		http.Error(w, "wrong password", http.StatusUnauthorized)
+		return
+	}
+
+	token, _ := GenerateToken(stored.ID)
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"message": "login success",
+		"token": token,
+	})
 }

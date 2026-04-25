@@ -28,23 +28,23 @@ func main() {
 	http.HandleFunc("/users", handlers.GetUsers)
 	http.HandleFunc("/users/create", handlers.CreateUser)
 
-	http.HandleFunc("/expenses", handlers.GetExpenses)
+	http.HandleFunc("/expenses", handlers.AuthMiddleware(handlers.GetExpenses))
 	http.HandleFunc("/expenses/create", handlers.CreateExpense)
 	http.HandleFunc("/expenses/update", handlers.UpdateExpense)
 	http.HandleFunc("/expenses/delete", handlers.DeleteExpense)
 	http.HandleFunc("/user-expenses", handlers.GetUserExpenses)
 
+	http.HandleFunc("/register", handlers.RegisterUser)
+	http.HandleFunc("/login", handlers.LoginUser)
+
 	// Ambil PORT dari Railway
 	port := os.Getenv("PORT")
 
-	// Debug: cek port dari Railway
-	fmt.Println("PORT from Railway:", port)
-
-	// WAJIB: Railway harus kasih port
 	if port == "" {
-		fmt.Println("ERROR: PORT not set")
-		return
+		port = "8080"
 	}
+
+	fmt.Println("Server running on port", port)
 
 	fmt.Println("Server running on port", port)
 

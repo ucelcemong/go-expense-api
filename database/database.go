@@ -29,10 +29,11 @@ func Connect() {
 
 func createTables() {
 	userTable := `
-	CREATE TABLE IF NOT EXISTS users (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT
-	);`
+CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        password TEXT
+);`
 
 	expenseTable := `
 	CREATE TABLE IF NOT EXISTS expenses (

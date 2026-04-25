@@ -34,10 +34,16 @@ func main() {
 	http.HandleFunc("/expenses/delete", handlers.DeleteExpense)
 	http.HandleFunc("/user-expenses", handlers.GetUserExpenses)
 
-	// Port Railway
+	// Ambil PORT dari Railway
 	port := os.Getenv("PORT")
+
+	// Debug: cek port dari Railway
+	fmt.Println("PORT from Railway:", port)
+
+	// WAJIB: Railway harus kasih port
 	if port == "" {
-		port = "8080"
+		fmt.Println("ERROR: PORT not set")
+		return
 	}
 
 	fmt.Println("Server running on port", port)

@@ -15,13 +15,13 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	fmt.Println("APP STARTING...")
 	database.Connect()
+	fmt.Println("AFTER DB CONNECT")
 
 	http.HandleFunc("/", homeHandler)
-
 	http.HandleFunc("/users", handlers.GetUsers)
 	http.HandleFunc("/users/create", handlers.CreateUser)
-
 	http.HandleFunc("/expenses", handlers.GetExpenses)
 	http.HandleFunc("/expenses/create", handlers.CreateExpense)
 	http.HandleFunc("/expenses/update", handlers.UpdateExpense)
